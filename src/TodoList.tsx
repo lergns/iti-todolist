@@ -1,25 +1,34 @@
 import React, { KeyboardEvent, ChangeEvent, useState } from "react";
 import { FilterValuesType, TaskType } from "./App";
 
-type TodoListPropsType = {
+type ToDoListPropsType = {
+  id: string;
   title: string;
   toDoListFilter: FilterValuesType;
   tasks: Array<TaskType>;
-  removeTask: (taskID: string) => void;
-  addTask: (title: string) => void;
-  changeToDoListFilter: (newFilterValue: FilterValuesType) => void;
-  changeTaskStatus: (taskID: string, newIsDoneValue: boolean) => void;
+  removeTask: (toDoListID: string, taskID: string) => void;
+  addTask: (toDoListID: string, title: string) => void;
+  changeToDoListFilter: (
+    toDoListID: string,
+    newFilterValue: FilterValuesType
+  ) => void;
+  removeToDoList: (toDoListID: string) => void;
+  changeTaskStatus: (
+    toDoListID: string,
+    taskID: string,
+    newIsDoneValue: boolean
+  ) => void; // adding toDoListID: string to props' callbacks
 };
 
-export function TodoList(props: TodoListPropsType) {
+export function TodoList(props: ToDoListPropsType) {
   const [newTaskTitle, setNewTaskTitle] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); // managing local state of each todolist
 
   const tasksRendered = props.tasks.map((task) => {
-    const onRemoveTask = () => props.removeTask(task.id); // declaring onRemoveTask() and changeStatus() inside of the .map() method, so that these functions are available for all tasks !
+    const onRemoveTask = () => props.removeTask(props.id, task.id); // order of parameters depends on props type (ToDoListPropsType) !
 
     const changeTaskStatus = (event: ChangeEvent<HTMLInputElement>) =>
-      props.changeTaskStatus(task.id, event.currentTarget.checked); // task.id - each task from the mapped tasks array (tasksRendered() parent function !); newIsDoneValue is taken from event.currentTarget.checked
+      props.changeTaskStatus(props.id, task.id, event.currentTarget.checked);
 
     // return of tasksRendered()
     return (
@@ -35,11 +44,11 @@ export function TodoList(props: TodoListPropsType) {
         </button>
       </li>
     );
-  }); // adding className "is-done" if task.isDone === true
+  });
 
   const changeTitle = (event: ChangeEvent<HTMLInputElement>) => {
     setNewTaskTitle(event.currentTarget.value);
-    setError(null); // when changing the input - error === null
+    setError(null);
   };
 
   const onKeyPressAddTask = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -47,30 +56,38 @@ export function TodoList(props: TodoListPropsType) {
   };
 
   const addTask = () => {
-    const trimmedNewTaskTitle = newTaskTitle.trim(); // .trim() trims free spaces from both before and after string
-    if (trimmedNewTaskTitle) props.addTask(trimmedNewTaskTitle);
-    // truthy/falsy value - prohibits adding "" as new task
-    else setError("Title is required"); // if trimmedNewTaskTitle === false (falsy value), error === "Title is required"
+    const trimmedNewTaskTitle = newTaskTitle.trim();
+    if (trimmedNewTaskTitle) props.addTask(props.id, trimmedNewTaskTitle);
+    else setError("Title is required");
 
-    setNewTaskTitle(""); // clearing the input field
+    setNewTaskTitle("");
   };
 
-  const setAllFilterValue = () => props.changeToDoListFilter("all");
-  const setActiveFilterValue = () => props.changeToDoListFilter("active");
-  const setCompletedFilterValue = () => props.changeToDoListFilter("completed");
+  const setAllFilterValue = () => props.changeToDoListFilter(props.id, "all");
+  const setActiveFilterValue = () =>
+    props.changeToDoListFilter(props.id, "active");
+  const setCompletedFilterValue = () =>
+    props.changeToDoListFilter(props.id, "completed"); // passing toDoListID and newFilterValue from UI (callback on click on certain todolist) to BLL's setToDoLists() !
 
   const allButtonFilter = props.toDoListFilter === "all" ? "active-filter" : "";
   const activeButtonFilter =
     props.toDoListFilter === "active" ? "active-filter" : "";
   const completedButtonFilter =
-    props.toDoListFilter === "completed" ? "active-filter" : ""; // assigning class depending on the ternary operator
+    props.toDoListFilter === "completed" ? "active-filter" : "";
 
-  const errorText = error ? <div className={"error-text"}>{error}</div> : null; // if error === true (if setError has set error to "Title is required" --> truthy value !), render it inside of a <div>
+  const errorText = error ? <div className={"error-text"}>{error}</div> : null;
+
+  const removeToDoList = () => props.removeToDoList(props.id);
 
   // return of TodoList()
   return (
     <div>
-      <h3>{props.title}</h3>
+      <h3>
+        {props.title}
+        <button onClick={removeToDoList} className={"btn-remove"}>
+          X
+        </button>
+      </h3>
       <div>
         <input
           value={newTaskTitle}
@@ -79,7 +96,7 @@ export function TodoList(props: TodoListPropsType) {
           className={error ? "error" : ""}
         />
         <button onClick={addTask}>+</button>
-        {errorText} {/* conditional rendering of errorText */}
+        {errorText}
       </div>
       <ul>{tasksRendered}</ul>
 
