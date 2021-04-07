@@ -1,5 +1,7 @@
-import React, { KeyboardEvent, ChangeEvent, useState } from "react";
+import React, { ChangeEvent } from "react";
 import { FilterValuesType, TaskType } from "./App";
+import { AddItemForm } from "./AddItemForm";
+import { EditableSpan } from "./EditableSpan";
 
 type ToDoListPropsType = {
   id: string;
@@ -10,25 +12,31 @@ type ToDoListPropsType = {
   addTask: (toDoListID: string, title: string) => void;
   changeToDoListFilter: (
     toDoListID: string,
-    newFilterValue: FilterValuesType
+    changedFilterValue: FilterValuesType
   ) => void;
   removeToDoList: (toDoListID: string) => void;
   changeTaskStatus: (
     toDoListID: string,
     taskID: string,
     newIsDoneValue: boolean
-  ) => void; // adding toDoListID: string to props' callbacks
+  ) => void;
+  changeTaskTitle: (
+    toDoListID: string,
+    taskID: string,
+    changedTitle: string
+  ) => void;
+  changeToDoListTitle: (toDoListID: string, changedTitle: string) => void;
 };
 
 export function TodoList(props: ToDoListPropsType) {
-  const [newTaskTitle, setNewTaskTitle] = useState<string>("");
-  const [error, setError] = useState<string | null>(null); // managing local state of each todolist
-
   const tasksRendered = props.tasks.map((task) => {
-    const onRemoveTask = () => props.removeTask(props.id, task.id); // order of parameters depends on props type (ToDoListPropsType) !
+    const onRemoveTask = () => props.removeTask(props.id, task.id);
 
     const changeTaskStatus = (event: ChangeEvent<HTMLInputElement>) =>
       props.changeTaskStatus(props.id, task.id, event.currentTarget.checked);
+
+    const changeTaskTitle = (changedTitle: string) =>
+      props.changeTaskTitle(props.id, task.id, changedTitle); // changedTitle received from <EditableSpan> via callback, passing forward from <TodoList> to <App> via callback
 
     // return of tasksRendered()
     return (
@@ -38,7 +46,8 @@ export function TodoList(props: ToDoListPropsType) {
           type="checkbox"
           checked={task.isDone}
         />
-        <span>{task.title}</span>
+        <EditableSpan title={task.title} changeTitle={changeTaskTitle} />
+        {/* Inside of tasksRendered(), <EditableSpan> changes tasks' titles (due to the callback from <App> it receives) ! */}
         <button className={"btn-remove"} onClick={onRemoveTask}>
           x
         </button>
@@ -46,28 +55,11 @@ export function TodoList(props: ToDoListPropsType) {
     );
   });
 
-  const changeTitle = (event: ChangeEvent<HTMLInputElement>) => {
-    setNewTaskTitle(event.currentTarget.value);
-    setError(null);
-  };
-
-  const onKeyPressAddTask = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") addTask();
-  };
-
-  const addTask = () => {
-    const trimmedNewTaskTitle = newTaskTitle.trim();
-    if (trimmedNewTaskTitle) props.addTask(props.id, trimmedNewTaskTitle);
-    else setError("Title is required");
-
-    setNewTaskTitle("");
-  };
-
   const setAllFilterValue = () => props.changeToDoListFilter(props.id, "all");
   const setActiveFilterValue = () =>
     props.changeToDoListFilter(props.id, "active");
   const setCompletedFilterValue = () =>
-    props.changeToDoListFilter(props.id, "completed"); // passing toDoListID and newFilterValue from UI (callback on click on certain todolist) to BLL's setToDoLists() !
+    props.changeToDoListFilter(props.id, "completed");
 
   const allButtonFilter = props.toDoListFilter === "all" ? "active-filter" : "";
   const activeButtonFilter =
@@ -75,31 +67,26 @@ export function TodoList(props: ToDoListPropsType) {
   const completedButtonFilter =
     props.toDoListFilter === "completed" ? "active-filter" : "";
 
-  const errorText = error ? <div className={"error-text"}>{error}</div> : null;
+  const addTask = (title: string) => props.addTask(props.id, title); // creating new addTask() (for <AddItemForm> component), whose toDoListID parameter will be deducted automatically (taken from props.id) --> new addTask() should now only receive title as parameter !
 
   const removeToDoList = () => props.removeToDoList(props.id);
+
+  const changeToDoListTitle = (changedTitle: string) =>
+    props.changeToDoListTitle(props.id, changedTitle);
 
   // return of TodoList()
   return (
     <div>
       <h3>
-        {props.title}
+        <EditableSpan title={props.title} changeTitle={changeToDoListTitle} />
+        {/* Inside of <TodoList>, <EditableSpan> changes todolist's title (due to the callback from <App> it receives) ! */}
         <button onClick={removeToDoList} className={"btn-remove"}>
           X
         </button>
       </h3>
-      <div>
-        <input
-          value={newTaskTitle}
-          onChange={changeTitle}
-          onKeyPress={onKeyPressAddTask}
-          className={error ? "error" : ""}
-        />
-        <button onClick={addTask}>+</button>
-        {errorText}
-      </div>
+      <AddItemForm addItem={addTask} />
+      {/* Inside of <TodoList>, <AddItemForm> adds new task (due to the callback from <App> it receives) ! */}
       <ul>{tasksRendered}</ul>
-
       <div>
         <button className={allButtonFilter} onClick={setAllFilterValue}>
           All

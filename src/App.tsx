@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import { TodoList } from "./TodoList";
 import { v1 } from "uuid";
+import { AddItemForm } from "./AddItemForm";
 
 export type TaskType = {
   id: string;
@@ -11,11 +12,11 @@ export type TaskType = {
 
 export type FilterValuesType = "all" | "active" | "completed";
 
-export type ToDoListStateType = {
+export type ToDoListType = {
   id: string;
   title: string;
   filter: FilterValuesType;
-}; // type of todolist
+};
 
 export type TasksStateType = {
   [key: string]: Array<TaskType>;
@@ -24,16 +25,15 @@ export type TasksStateType = {
 function App() {
   // BLL:
   const toDoListID_1 = v1();
-  const toDoListID_2 = v1(); // todolists' ids are stored in variables
+  const toDoListID_2 = v1();
 
-  const [toDoLists, setToDoLists] = useState<Array<ToDoListStateType>>([
+  const [toDoLists, setToDoLists] = useState<Array<ToDoListType>>([
     { id: toDoListID_1, title: "What to learn", filter: "all" },
     { id: toDoListID_2, title: "What to buy", filter: "all" },
-  ]); // todolists' state
+  ]);
 
   const [tasks, setTasks] = useState<TasksStateType>({
     [toDoListID_1]: [
-      // [toDoListID_1] has to be in [] so that JS understands it is not newly-created property with local scope, but reference to a variable from scope chain !
       { id: v1(), title: "HTML", isDone: true },
       { id: v1(), title: "CSS", isDone: true },
       { id: v1(), title: "React", isDone: false },
@@ -43,11 +43,11 @@ function App() {
       { id: v1(), title: "Bread", isDone: false },
       { id: v1(), title: "Onion", isDone: false },
     ],
-  }); // tasks' state; associative array; todolists and tasks are linked via unique ids stored in variables
+  });
 
   function removeTask(toDoListID: string, taskID: string) {
-    tasks[toDoListID] = tasks[toDoListID].filter((task) => task.id !== taskID); // filtering out task to be removed by certain taskID
-    setTasks({ ...tasks }); // passing new object with COPY of tasks object without removed task - object immutability principle of the functional programming !
+    tasks[toDoListID] = tasks[toDoListID].filter((task) => task.id !== taskID);
+    setTasks({ ...tasks });
   }
 
   function addTask(toDoListID: string, title: string) {
@@ -55,11 +55,11 @@ function App() {
       id: v1(),
       title,
       isDone: false,
-    }; // creating new task with received title
+    };
 
-    const updatedTasks = [newTask, ...tasks[toDoListID]]; // creating new array with copy of tasks of a certain todolist + its newTask
-    setTasks({ ...tasks, [toDoListID]: updatedTasks }); // setting copy of tasks with updatedTasks (of a certain todolist, defined by toDoListID received from UI via callback) array, which contains new task
-  }
+    const updatedTasks = [newTask, ...tasks[toDoListID]];
+    setTasks({ ...tasks, [toDoListID]: updatedTasks });
+  } // used in TodoList()'s return JSX (<TodoList> component)
 
   function changeTaskStatus(
     toDoListID: string,
@@ -73,14 +73,27 @@ function App() {
     setTasks({ ...tasks, [toDoListID]: checkedTasks });
   }
 
+  function changeTaskTitle(
+    toDoListID: string,
+    taskID: string,
+    changedTitle: string
+  ) {
+    const changedTasks = tasks[toDoListID].map((task) =>
+      task.id === taskID ? { ...task, title: changedTitle } : task
+    );
+
+    setTasks({ ...tasks, [toDoListID]: changedTasks });
+  } /* used in tasksRendered()'s return JSX (<TodoList> component); 
+    actually CHANGING certain todolist's certain task's title, passed from <EditableSpan> to <TodoList> to <App> via chain of callbacks ! */
+
   function changeToDoListFilter(
     toDoListID: string,
-    newFilterValue: FilterValuesType
+    changedFilterValue: FilterValuesType
   ) {
     setToDoLists(
       toDoLists.map((toDoList) =>
         toDoList.id === toDoListID
-          ? { ...toDoList, filter: newFilterValue }
+          ? { ...toDoList, filter: changedFilterValue }
           : toDoList
       )
     );
@@ -88,10 +101,36 @@ function App() {
 
   function removeToDoList(toDoListID: string) {
     setToDoLists(toDoLists.filter((toDoList) => toDoList.id !== toDoListID));
-    delete tasks[toDoListID]; // deleting tasks of deleted todolist as well as todolist itself
+    delete tasks[toDoListID];
   }
 
-  function getTasksForToDoList(toDoList: ToDoListStateType): Array<TaskType> {
+  function addToDoList(title: string) {
+    const newToDoListID = v1(); // creating new todolist's id
+    const newToDoList: ToDoListType = {
+      id: newToDoListID,
+      title,
+      filter: "all",
+    }; // used in App()'s return JSX (<App> component)
+
+    setToDoLists([...toDoLists, newToDoList]); // updating state with new todolist
+
+    setTasks({ ...tasks, [newToDoListID]: [] }); // linking new todolist's id (key of tasks object) with empty tasks array (value of tasks object)
+  }
+
+  function changeToDoListTitle(toDoListID: string, changedTitle: string) {
+    const updatedToDoLists = toDoLists.map((toDoList) =>
+      toDoList.id === toDoListID
+        ? {
+            ...toDoList,
+            title: changedTitle,
+          }
+        : toDoList
+    );
+
+    setToDoLists(updatedToDoLists);
+  } // used in TodoList()'s return JSX (<TodoList> component)
+
+  function getTasksForToDoList(toDoList: ToDoListType): Array<TaskType> {
     switch (toDoList.filter) {
       case "active":
         return tasks[toDoList.id].filter((task) => !task.isDone);
@@ -107,15 +146,12 @@ function App() {
   // UI:
   return (
     <div className="App">
+      <AddItemForm addItem={addToDoList} />
+      {/* Inside of <TodoList>, <AddItemForm> adds new task (due to the callback from <App> it receives) ! */}
       {toDoLists.map((toDoList) => {
-        {
-          /* mapping through the whole todolists state array and for each todolist returning JSX */
-        }
         return (
           <TodoList
-            key={
-              toDoList.id
-            } /* key - reserved React keyword; it has to be set since we're inside of .map() method ! */
+            key={toDoList.id}
             id={toDoList.id}
             title={toDoList.title}
             toDoListFilter={toDoList.filter}
@@ -125,6 +161,8 @@ function App() {
             addTask={addTask}
             changeToDoListFilter={changeToDoListFilter}
             changeTaskStatus={changeTaskStatus}
+            changeTaskTitle={changeTaskTitle}
+            changeToDoListTitle={changeToDoListTitle}
           />
         );
       })}
