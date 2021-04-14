@@ -2,6 +2,8 @@ import React, { ChangeEvent } from "react";
 import { FilterValuesType, TaskType } from "./App";
 import { AddItemForm } from "./AddItemForm";
 import { EditableSpan } from "./EditableSpan";
+import { Button, Checkbox, IconButton } from "@material-ui/core";
+import { Delete } from "@material-ui/icons";
 
 type ToDoListPropsType = {
   id: string;
@@ -36,21 +38,21 @@ export function TodoList(props: ToDoListPropsType) {
       props.changeTaskStatus(props.id, task.id, event.currentTarget.checked);
 
     const changeTaskTitle = (changedTitle: string) =>
-      props.changeTaskTitle(props.id, task.id, changedTitle); // changedTitle received from <EditableSpan> via callback, passing forward from <TodoList> to <App> via callback
+      props.changeTaskTitle(props.id, task.id, changedTitle);
 
     // return of tasksRendered()
     return (
       <li key={task.id} className={task.isDone ? "is-done" : ""}>
-        <input
-          onChange={changeTaskStatus}
-          type="checkbox"
+        <Checkbox
           checked={task.isDone}
+          onChange={changeTaskStatus}
+          color={"primary"}
         />
+
         <EditableSpan title={task.title} changeTitle={changeTaskTitle} />
-        {/* Inside of tasksRendered(), <EditableSpan> changes tasks' titles (due to the callback from <App> it receives) ! */}
-        <button className={"btn-remove"} onClick={onRemoveTask}>
-          x
-        </button>
+        <IconButton onClick={onRemoveTask}>
+          <Delete />
+        </IconButton>
       </li>
     );
   });
@@ -61,13 +63,7 @@ export function TodoList(props: ToDoListPropsType) {
   const setCompletedFilterValue = () =>
     props.changeToDoListFilter(props.id, "completed");
 
-  const allButtonFilter = props.toDoListFilter === "all" ? "active-filter" : "";
-  const activeButtonFilter =
-    props.toDoListFilter === "active" ? "active-filter" : "";
-  const completedButtonFilter =
-    props.toDoListFilter === "completed" ? "active-filter" : "";
-
-  const addTask = (title: string) => props.addTask(props.id, title); // creating new addTask() (for <AddItemForm> component), whose toDoListID parameter will be deducted automatically (taken from props.id) --> new addTask() should now only receive title as parameter !
+  const addTask = (title: string) => props.addTask(props.id, title);
 
   const removeToDoList = () => props.removeToDoList(props.id);
 
@@ -79,27 +75,42 @@ export function TodoList(props: ToDoListPropsType) {
     <div>
       <h3>
         <EditableSpan title={props.title} changeTitle={changeToDoListTitle} />
-        {/* Inside of <TodoList>, <EditableSpan> changes todolist's title (due to the callback from <App> it receives) ! */}
-        <button onClick={removeToDoList} className={"btn-remove"}>
-          X
-        </button>
+
+        <IconButton onClick={removeToDoList}>
+          <Delete />
+        </IconButton>
       </h3>
       <AddItemForm addItem={addTask} />
-      {/* Inside of <TodoList>, <AddItemForm> adds new task (due to the callback from <App> it receives) ! */}
-      <ul>{tasksRendered}</ul>
+      <ul style={{ listStyle: "none", padding: "0" }}>{tasksRendered}</ul>
       <div>
-        <button className={allButtonFilter} onClick={setAllFilterValue}>
+        <Button
+          onClick={setAllFilterValue}
+          color={"primary"}
+          variant={props.toDoListFilter === "all" ? "outlined" : "contained"}
+          size={"small"}
+          style={{ marginRight: "5px" }}
+        >
           All
-        </button>
-        <button className={activeButtonFilter} onClick={setActiveFilterValue}>
+        </Button>
+        <Button
+          onClick={setActiveFilterValue}
+          color={"primary"}
+          variant={props.toDoListFilter === "active" ? "outlined" : "contained"}
+          size={"small"}
+          style={{ marginRight: "5px" }}
+        >
           Active
-        </button>
-        <button
-          className={completedButtonFilter}
+        </Button>
+        <Button
           onClick={setCompletedFilterValue}
+          color={"primary"}
+          variant={
+            props.toDoListFilter === "completed" ? "outlined" : "contained"
+          }
+          size={"small"}
         >
           Completed
-        </button>
+        </Button>
       </div>
     </div>
   );

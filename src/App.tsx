@@ -3,6 +3,17 @@ import "./App.css";
 import { TodoList } from "./TodoList";
 import { v1 } from "uuid";
 import { AddItemForm } from "./AddItemForm";
+import {
+  AppBar,
+  Button,
+  Container,
+  Grid,
+  IconButton,
+  Paper,
+  Toolbar,
+  Typography,
+} from "@material-ui/core";
+import { Menu } from "@material-ui/icons";
 
 export type TaskType = {
   id: string;
@@ -23,7 +34,6 @@ export type TasksStateType = {
 };
 
 function App() {
-  // BLL:
   const toDoListID_1 = v1();
   const toDoListID_2 = v1();
 
@@ -59,7 +69,7 @@ function App() {
 
     const updatedTasks = [newTask, ...tasks[toDoListID]];
     setTasks({ ...tasks, [toDoListID]: updatedTasks });
-  } // used in TodoList()'s return JSX (<TodoList> component)
+  }
 
   function changeTaskStatus(
     toDoListID: string,
@@ -83,8 +93,7 @@ function App() {
     );
 
     setTasks({ ...tasks, [toDoListID]: changedTasks });
-  } /* used in tasksRendered()'s return JSX (<TodoList> component); 
-    actually CHANGING certain todolist's certain task's title, passed from <EditableSpan> to <TodoList> to <App> via chain of callbacks ! */
+  }
 
   function changeToDoListFilter(
     toDoListID: string,
@@ -105,16 +114,15 @@ function App() {
   }
 
   function addToDoList(title: string) {
-    const newToDoListID = v1(); // creating new todolist's id
+    const newToDoListID = v1();
     const newToDoList: ToDoListType = {
       id: newToDoListID,
       title,
       filter: "all",
-    }; // used in App()'s return JSX (<App> component)
+    };
 
-    setToDoLists([...toDoLists, newToDoList]); // updating state with new todolist
-
-    setTasks({ ...tasks, [newToDoListID]: [] }); // linking new todolist's id (key of tasks object) with empty tasks array (value of tasks object)
+    setToDoLists([...toDoLists, newToDoList]);
+    setTasks({ ...tasks, [newToDoListID]: [] });
   }
 
   function changeToDoListTitle(toDoListID: string, changedTitle: string) {
@@ -128,7 +136,7 @@ function App() {
     );
 
     setToDoLists(updatedToDoLists);
-  } // used in TodoList()'s return JSX (<TodoList> component)
+  }
 
   function getTasksForToDoList(toDoList: ToDoListType): Array<TaskType> {
     switch (toDoList.filter) {
@@ -143,15 +151,12 @@ function App() {
     }
   }
 
-  // UI:
-  return (
-    <div className="App">
-      <AddItemForm addItem={addToDoList} />
-      {/* Inside of <TodoList>, <AddItemForm> adds new task (due to the callback from <App> it receives) ! */}
-      {toDoLists.map((toDoList) => {
-        return (
+  const toDoListComponents = toDoLists.map((toDoList) => {
+    return (
+      <Grid item key={toDoList.id}>
+        {/* <Grid item={true}/> - child element of <Grid container /> */}
+        <Paper elevation={6} style={{ padding: "20px" }}>
           <TodoList
-            key={toDoList.id}
             id={toDoList.id}
             title={toDoList.title}
             toDoListFilter={toDoList.filter}
@@ -164,8 +169,33 @@ function App() {
             changeTaskTitle={changeTaskTitle}
             changeToDoListTitle={changeToDoListTitle}
           />
-        );
-      })}
+        </Paper>
+      </Grid>
+    );
+  });
+
+  return (
+    <div className="App">
+      <AppBar position="static">
+        <Toolbar style={{ justifyContent: "space-between" }}>
+          <IconButton edge="start" color="inherit" aria-label="menu">
+            <Menu />
+          </IconButton>
+          <Typography variant="h6">To-Do Lists</Typography>
+          <Button variant={"outlined"} color="inherit">
+            Login
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Container fixed>
+        <Grid container style={{ padding: "20px 0" }}>
+          <AddItemForm addItem={addToDoList} />
+        </Grid>
+        <Grid container spacing={5}>
+          {/* <Grid container/> - "parent" <Grid/>  spacing={5} - spacing between its children - <Grid item/>'s */}
+          {toDoListComponents}
+        </Grid>
+      </Container>
     </div>
   );
 }

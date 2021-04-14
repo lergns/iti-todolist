@@ -1,7 +1,9 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from "react";
+import { IconButton, TextField } from "@material-ui/core";
+import { AddBox } from "@material-ui/icons";
 
 type AddItemFormPropsType = {
-  addItem: (title: string) => void; // either addToDoList() - if passed from App(), or addTask() - if passed from TodoList()
+  addItem: (title: string) => void;
 };
 
 export function AddItemForm(props: AddItemFormPropsType) {
@@ -25,18 +27,21 @@ export function AddItemForm(props: AddItemFormPropsType) {
     if (event.key === "Enter") addItem();
   };
 
-  const errorText = error ? <div className={"error-text"}>{error}</div> : null;
-
   return (
     <div>
-      <input
+      <TextField
         value={newTitle}
         onChange={changeTitle}
         onKeyPress={onKeyPressAddItem}
-        className={error ? "error" : ""}
+        variant={"outlined"}
+        label={"Title"}
+        error={!!error} // turning string into boolean (not passing truthy/falsy value)
+        helperText={error} // displayed when error is truthy value - error={true}
       />
-      <button onClick={addItem}>+</button>
-      {errorText}
+
+      <IconButton onClick={addItem} color={"primary"}>
+        <AddBox />
+      </IconButton>
     </div>
   );
 }
