@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
-import { TodoList } from "./TodoList";
+import { ToDoList } from "./ToDoList";
 import { v1 } from "uuid";
 import { AddItemForm } from "./AddItemForm";
 import {
@@ -69,7 +69,7 @@ function App() {
 
     const updatedTasks = [newTask, ...tasks[toDoListID]];
     setTasks({ ...tasks, [toDoListID]: updatedTasks });
-  }
+  } // used in TodoList()'s return JSX (<TodoList> component)
 
   function changeTaskStatus(
     toDoListID: string,
@@ -93,7 +93,7 @@ function App() {
     );
 
     setTasks({ ...tasks, [toDoListID]: changedTasks });
-  }
+  } // used in tasksRendered()'s return JSX (<TodoList> component)
 
   function changeToDoListFilter(
     toDoListID: string,
@@ -123,7 +123,7 @@ function App() {
 
     setToDoLists([...toDoLists, newToDoList]);
     setTasks({ ...tasks, [newToDoListID]: [] });
-  }
+  } // used in App()'s return JSX (<App> component)
 
   function changeToDoListTitle(toDoListID: string, changedTitle: string) {
     const updatedToDoLists = toDoLists.map((toDoList) =>
@@ -136,8 +136,9 @@ function App() {
     );
 
     setToDoLists(updatedToDoLists);
-  }
+  } // used in TodoList()'s return JSX (<TodoList> component)
 
+  // UI
   function getTasksForToDoList(toDoList: ToDoListType): Array<TaskType> {
     switch (toDoList.filter) {
       case "active":
@@ -154,9 +155,8 @@ function App() {
   const toDoListComponents = toDoLists.map((toDoList) => {
     return (
       <Grid item key={toDoList.id}>
-        {/* <Grid item={true}/> - child element of <Grid container /> */}
         <Paper elevation={6} style={{ padding: "20px" }}>
-          <TodoList
+          <ToDoList
             id={toDoList.id}
             title={toDoList.title}
             toDoListFilter={toDoList.filter}
@@ -190,9 +190,9 @@ function App() {
       <Container fixed>
         <Grid container style={{ padding: "20px 0" }}>
           <AddItemForm addItem={addToDoList} />
+          {/* Inside of <App>, <AddItemForm> adds new todolist (due to the callback from <App> it receives) ! */}
         </Grid>
         <Grid container spacing={5}>
-          {/* <Grid container/> - "parent" <Grid/>  spacing={5} - spacing between its children - <Grid item/>'s */}
           {toDoListComponents}
         </Grid>
       </Container>

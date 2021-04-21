@@ -30,7 +30,7 @@ type ToDoListPropsType = {
   changeToDoListTitle: (toDoListID: string, changedTitle: string) => void;
 };
 
-export function TodoList(props: ToDoListPropsType) {
+export function ToDoList(props: ToDoListPropsType) {
   const tasksRendered = props.tasks.map((task) => {
     const onRemoveTask = () => props.removeTask(props.id, task.id);
 
@@ -38,7 +38,7 @@ export function TodoList(props: ToDoListPropsType) {
       props.changeTaskStatus(props.id, task.id, event.currentTarget.checked);
 
     const changeTaskTitle = (changedTitle: string) =>
-      props.changeTaskTitle(props.id, task.id, changedTitle);
+      props.changeTaskTitle(props.id, task.id, changedTitle); // changedTitle received from <EditableSpan> via callback, passing forward from <TodoList> to <App> via callback
 
     // return of tasksRendered()
     return (
@@ -50,6 +50,7 @@ export function TodoList(props: ToDoListPropsType) {
         />
 
         <EditableSpan title={task.title} changeTitle={changeTaskTitle} />
+        {/* Inside of tasksRendered(), <EditableSpan> changes tasks' titles (due to the callback from <App> it receives) ! */}
         <IconButton onClick={onRemoveTask}>
           <Delete />
         </IconButton>
@@ -70,17 +71,19 @@ export function TodoList(props: ToDoListPropsType) {
   const changeToDoListTitle = (changedTitle: string) =>
     props.changeToDoListTitle(props.id, changedTitle);
 
-  // return of TodoList()
+  // return of ToDoList()
   return (
     <div>
       <h3>
         <EditableSpan title={props.title} changeTitle={changeToDoListTitle} />
+        {/* Inside of <TodoList>, <EditableSpan> changes todolist's title (due to the callback from <App> it receives) ! */}
 
         <IconButton onClick={removeToDoList}>
           <Delete />
         </IconButton>
       </h3>
       <AddItemForm addItem={addTask} />
+      {/* Inside of <TodoList>, <AddItemForm> adds new task (due to the callback from <App> it receives) ! */}
       <ul style={{ listStyle: "none", padding: "0" }}>{tasksRendered}</ul>
       <div>
         <Button

@@ -3,7 +3,7 @@ import { IconButton, TextField } from "@material-ui/core";
 import { AddBox } from "@material-ui/icons";
 
 type AddItemFormPropsType = {
-  addItem: (title: string) => void;
+  addItem: (title: string) => void; // either addToDoList() - if passed from App(), or addTask() - if passed from TodoList()
 };
 
 export function AddItemForm(props: AddItemFormPropsType) {
@@ -35,8 +35,8 @@ export function AddItemForm(props: AddItemFormPropsType) {
         onKeyPress={onKeyPressAddItem}
         variant={"outlined"}
         label={"Title"}
-        error={!!error} // turning string into boolean (not passing truthy/falsy value)
-        helperText={error} // displayed when error is truthy value - error={true}
+        error={!!error}
+        helperText={error}
       />
 
       <IconButton onClick={addItem} color={"primary"}>
