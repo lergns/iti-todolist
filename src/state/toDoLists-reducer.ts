@@ -2,21 +2,22 @@ import { FilterValuesType, ToDoListType } from "../App";
 import { v1 } from "uuid";
 // IMPORTS
 
-type RemoveToDoListActionType = {
-  type: "REMOVE_TODOLIST";
+export type RemoveToDoListActionType = {
+  type: "REMOVE-TODOLIST";
   toDoListID: string;
 };
-type AddToDoListActionType = {
-  type: "ADD_TODOLIST";
+export type AddToDoListActionType = {
+  type: "ADD-TODOLIST";
+  toDoListID: string;
   title: string;
 };
 type ChangeToDoListTitleActionType = {
-  type: "CHANGE_TODOLIST_TITLE";
+  type: "CHANGE-TODOLIST-TITLE";
   toDoListID: string;
   changedTitle: string;
 };
 type ChangeToDoListFilterActionType = {
-  type: "CHANGE_TODOLIST_FILTER";
+  type: "CHANGE-TODOLIST-FILTER";
   toDoListID: string;
   changedFilterValue: FilterValuesType;
 };
@@ -31,13 +32,14 @@ export const removeToDoListAC = (
   toDoListID: string
 ): RemoveToDoListActionType => {
   return {
-    type: "REMOVE_TODOLIST",
+    type: "REMOVE-TODOLIST",
     toDoListID,
   };
 };
 export const addToDoListAC = (title: string): AddToDoListActionType => {
   return {
-    type: "ADD_TODOLIST",
+    type: "ADD-TODOLIST",
+    toDoListID: v1(),
     title,
   };
 };
@@ -46,7 +48,7 @@ export const changeToDoListTitleAC = (
   changedTitle: string
 ): ChangeToDoListTitleActionType => {
   return {
-    type: "CHANGE_TODOLIST_TITLE",
+    type: "CHANGE-TODOLIST-TITLE",
     toDoListID,
     changedTitle,
   };
@@ -56,32 +58,34 @@ export const changeToDoListFilterAC = (
   changedFilterValue: FilterValuesType
 ): ChangeToDoListFilterActionType => {
   return {
-    type: "CHANGE_TODOLIST_FILTER",
+    type: "CHANGE-TODOLIST-FILTER",
     toDoListID,
     changedFilterValue,
   };
 };
 // ACs
 
-// reducer === pure function - immutability principle!
 export const toDoListsReducer = (
-  toDoLists: Array<ToDoListType>,
+  toDoListsState: Array<ToDoListType>,
   action: ActionTypes
 ): Array<ToDoListType> => {
-  // (initial state, action)
   switch (action.type) {
-    case "REMOVE_TODOLIST":
-      return toDoLists.filter((toDoList) => toDoList.id !== action.toDoListID);
-    case "ADD_TODOLIST":
-      const newToDoListID = v1();
+    case "REMOVE-TODOLIST": {
+      const toDoListsCopy = [...toDoListsState];
+      return toDoListsCopy.filter(
+        (toDoList) => toDoList.id !== action.toDoListID
+      );
+    }
+    case "ADD-TODOLIST":
       const newToDoList: ToDoListType = {
-        id: newToDoListID,
+        id: action.toDoListID,
         title: action.title,
         filter: "all",
       };
-      return [...toDoLists, newToDoList];
-    case "CHANGE_TODOLIST_TITLE":
-      return toDoLists.map((toDoList) =>
+      return [...toDoListsState, newToDoList];
+    case "CHANGE-TODOLIST-TITLE": {
+      const toDoListsCopy = [...toDoListsState];
+      return toDoListsCopy.map((toDoList) =>
         toDoList.id === action.toDoListID
           ? {
               ...toDoList,
@@ -89,14 +93,16 @@ export const toDoListsReducer = (
             }
           : toDoList
       );
-    case "CHANGE_TODOLIST_FILTER": {
-      return toDoLists.map((toDoList) =>
+    }
+    case "CHANGE-TODOLIST-FILTER": {
+      const toDoListsCopy = [...toDoListsState];
+      return toDoListsCopy.map((toDoList) =>
         toDoList.id === action.toDoListID
           ? { ...toDoList, filter: action.changedFilterValue }
           : toDoList
       );
     }
     default:
-      return toDoLists;
+      return toDoListsState;
   }
 };
