@@ -1,10 +1,18 @@
-import { TasksStateType, TaskType } from "../App";
 import { v1 } from "uuid";
 import {
   AddToDoListActionType,
   RemoveToDoListActionType,
 } from "./toDoLists-reducer";
 // IMPORTS
+
+export type TaskType = {
+  id: string;
+  title: string;
+  isDone: boolean;
+};
+export type TasksStateType = {
+  [key: string]: Array<TaskType>;
+};
 
 type RemoveTaskActionType = {
   type: "REMOVE-TASK";
@@ -34,7 +42,7 @@ type ActionTypes =
   | ChangeTaskStatusActionType
   | ChangeTaskTitleActionType
   | AddToDoListActionType
-  | RemoveToDoListActionType; // importing from toDoLists-reducer.ts
+  | RemoveToDoListActionType;
 // TYPES
 
 export const removeTaskAC = (
@@ -83,14 +91,15 @@ export const changeTaskTitleAC = (
 };
 // ACs
 
+const initialTasksState: TasksStateType = {};
+
 export const tasksReducer = (
-  tasksState: TasksStateType,
+  tasksState = initialTasksState,
   action: ActionTypes
 ): TasksStateType => {
   switch (action.type) {
     case "REMOVE-TASK": {
-      const tasksCopy = { ...tasksState }; // NOT working with tasksState directly
-      // referencing associative array's property with [] notation
+      const tasksCopy = { ...tasksState };
       tasksCopy[action.toDoListID] = tasksCopy[action.toDoListID].filter(
         (task) => task.id !== action.taskID
       );
@@ -130,7 +139,7 @@ export const tasksReducer = (
       const tasksCopy = { ...tasksState };
       delete tasksCopy[action.toDoListID];
       return tasksCopy;
-    } // "ADD-TODOLIST" and "REMOVE-TODOLIST" - same actions used in different reducers (toDoLists-reducer and tasks-reducer)
+    }
     default:
       return tasksState;
   }

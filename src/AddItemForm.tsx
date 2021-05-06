@@ -3,7 +3,7 @@ import { IconButton, TextField } from "@material-ui/core";
 import { AddBox } from "@material-ui/icons";
 
 type AddItemFormPropsType = {
-  addItem: (title: string) => void; // either addToDoList() - if passed from App(), or addTask() - if passed from TodoList()
+  addItem: (title: string) => void; // either addToDoList() - if passed from AppWithReducers(), or addTask() - if passed from TodoList()
 };
 
 export function AddItemForm(props: AddItemFormPropsType) {

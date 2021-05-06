@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import "./App.css";
+import React from "react";
 import { ToDoList } from "./ToDoList";
-import { v1 } from "uuid";
 import { AddItemForm } from "./AddItemForm";
+import "./App.css";
 import {
   AppBar,
   Button,
@@ -14,45 +13,43 @@ import {
   Typography,
 } from "@material-ui/core";
 import { Menu } from "@material-ui/icons";
-import { FilterValuesType, ToDoListType } from "./state/toDoLists-reducer";
-import { TasksStateType, TaskType } from "./state/tasks-reducer";
+import {
+  addToDoListAC,
+  changeToDoListFilterAC,
+  changeToDoListTitleAC,
+  FilterValuesType,
+  removeToDoListAC,
+  ToDoListType,
+} from "./state/toDoLists-reducer";
+import {
+  addTaskAC,
+  changeTaskStatusAC,
+  changeTaskTitleAC,
+  removeTaskAC,
+  TasksStateType,
+  TaskType,
+} from "./state/tasks-reducer";
+import { useDispatch, useSelector } from "react-redux";
+import { RootStateType } from "./state/store";
 
-function App() {
-  const toDoListID_1 = v1();
-  const toDoListID_2 = v1();
+function AppWithRedux() {
+  // MSTP analogue
+  const toDoLists = useSelector<RootStateType, Array<ToDoListType>>(
+    (state) => state.toDoLists
+  );
+  const tasks = useSelector<RootStateType, TasksStateType>(
+    (state) => state.tasks
+  ); // useSelector() hook is connected to Redux's store.getState() behind the scenes --> has direct access to root state !
 
-  const [toDoLists, setToDoLists] = useState<Array<ToDoListType>>([
-    { id: toDoListID_1, title: "What to learn", filter: "all" },
-    { id: toDoListID_2, title: "What to buy", filter: "all" },
-  ]);
-
-  const [tasks, setTasks] = useState<TasksStateType>({
-    [toDoListID_1]: [
-      { id: v1(), title: "HTML", isDone: true },
-      { id: v1(), title: "CSS", isDone: true },
-      { id: v1(), title: "React", isDone: false },
-    ],
-    [toDoListID_2]: [
-      { id: v1(), title: "Milk", isDone: true },
-      { id: v1(), title: "Bread", isDone: false },
-      { id: v1(), title: "Onion", isDone: false },
-    ],
-  });
+  // MDTP analogue
+  const dispatch = useDispatch(); // useDispatch() hook dispatches to rootReducer() of Redux --> dispatching action into all reducers at once !
 
   function removeTask(toDoListID: string, taskID: string) {
-    tasks[toDoListID] = tasks[toDoListID].filter((task) => task.id !== taskID);
-    setTasks({ ...tasks });
+    dispatch(removeTaskAC(toDoListID, taskID));
   }
 
   function addTask(toDoListID: string, title: string) {
-    const newTask: TaskType = {
-      id: v1(),
-      title,
-      isDone: false,
-    };
-
-    const updatedTasks = [newTask, ...tasks[toDoListID]];
-    setTasks({ ...tasks, [toDoListID]: updatedTasks });
+    dispatch(addTaskAC(toDoListID, title));
   } // used in TodoList()'s return JSX (<TodoList> component)
 
   function changeTaskStatus(
@@ -60,11 +57,7 @@ function App() {
     taskID: string,
     newIsDoneValue: boolean
   ) {
-    const checkedTasks = tasks[toDoListID].map((task) =>
-      task.id === taskID ? { ...task, isDone: newIsDoneValue } : task
-    );
-
-    setTasks({ ...tasks, [toDoListID]: checkedTasks });
+    dispatch(changeTaskStatusAC(toDoListID, taskID, newIsDoneValue));
   }
 
   function changeTaskTitle(
@@ -72,54 +65,26 @@ function App() {
     taskID: string,
     changedTitle: string
   ) {
-    const changedTasks = tasks[toDoListID].map((task) =>
-      task.id === taskID ? { ...task, title: changedTitle } : task
-    );
-
-    setTasks({ ...tasks, [toDoListID]: changedTasks });
+    dispatch(changeTaskTitleAC(toDoListID, taskID, changedTitle));
   } // used in tasksRendered()'s return JSX (<TodoList> component)
 
   function changeToDoListFilter(
     toDoListID: string,
     changedFilterValue: FilterValuesType
   ) {
-    setToDoLists(
-      toDoLists.map((toDoList) =>
-        toDoList.id === toDoListID
-          ? { ...toDoList, filter: changedFilterValue }
-          : toDoList
-      )
-    );
+    dispatch(changeToDoListFilterAC(toDoListID, changedFilterValue));
   }
 
   function removeToDoList(toDoListID: string) {
-    setToDoLists(toDoLists.filter((toDoList) => toDoList.id !== toDoListID));
-    delete tasks[toDoListID];
+    dispatch(removeToDoListAC(toDoListID));
   }
 
   function addToDoList(title: string) {
-    const newToDoListID = v1();
-    const newToDoList: ToDoListType = {
-      id: newToDoListID,
-      title,
-      filter: "all",
-    };
-
-    setToDoLists([...toDoLists, newToDoList]);
-    setTasks({ ...tasks, [newToDoListID]: [] });
+    dispatch(addToDoListAC(title));
   } // used in AppWithReducers()'s return JSX (<AppWithReducers> component)
 
   function changeToDoListTitle(toDoListID: string, changedTitle: string) {
-    const updatedToDoLists = toDoLists.map((toDoList) =>
-      toDoList.id === toDoListID
-        ? {
-            ...toDoList,
-            title: changedTitle,
-          }
-        : toDoList
-    );
-
-    setToDoLists(updatedToDoLists);
+    dispatch(changeToDoListTitleAC(toDoListID, changedTitle));
   } // used in TodoList()'s return JSX (<TodoList> component)
 
   // UI
@@ -184,4 +149,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppWithRedux;

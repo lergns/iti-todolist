@@ -1,6 +1,11 @@
-import { FilterValuesType, ToDoListType } from "../App";
 import { v1 } from "uuid";
-// IMPORTS
+
+export type FilterValuesType = "all" | "active" | "completed";
+export type ToDoListType = {
+  id: string;
+  title: string;
+  filter: FilterValuesType;
+};
 
 export type RemoveToDoListActionType = {
   type: "REMOVE-TODOLIST";
@@ -65,8 +70,10 @@ export const changeToDoListFilterAC = (
 };
 // ACs
 
+const initialToDoListsState: Array<ToDoListType> = [];
+
 export const toDoListsReducer = (
-  toDoListsState: Array<ToDoListType>,
+  toDoListsState = initialToDoListsState,
   action: ActionTypes
 ): Array<ToDoListType> => {
   switch (action.type) {
@@ -82,7 +89,7 @@ export const toDoListsReducer = (
         title: action.title,
         filter: "all",
       };
-      return [...toDoListsState, newToDoList];
+      return [newToDoList, ...toDoListsState];
     case "CHANGE-TODOLIST-TITLE": {
       const toDoListsCopy = [...toDoListsState];
       return toDoListsCopy.map((toDoList) =>

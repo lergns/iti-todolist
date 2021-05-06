@@ -1,9 +1,10 @@
 import React, { ChangeEvent } from "react";
-import { FilterValuesType, TaskType } from "./App";
 import { AddItemForm } from "./AddItemForm";
 import { EditableSpan } from "./EditableSpan";
 import { Button, Checkbox, IconButton } from "@material-ui/core";
 import { Delete } from "@material-ui/icons";
+import { FilterValuesType } from "./state/toDoLists-reducer";
+import { TaskType } from "./state/tasks-reducer";
 
 type ToDoListPropsType = {
   id: string;
@@ -31,6 +32,15 @@ type ToDoListPropsType = {
 };
 
 export function ToDoList(props: ToDoListPropsType) {
+  /*const toDoList = useSelector<RootStateType, ToDoListType>(
+    (state) => state.toDoLists.filter((toDoList) => toDoList.id === props.id)[0]
+  );
+  const tasksOfToDoList = useSelector<RootStateType, Array<TaskType>>(
+    (state) => state.tasks[props.id]
+  );
+
+  const dispatch = useDispatch();*/
+
   const tasksRendered = props.tasks.map((task) => {
     const onRemoveTask = () => props.removeTask(props.id, task.id);
 
@@ -38,7 +48,7 @@ export function ToDoList(props: ToDoListPropsType) {
       props.changeTaskStatus(props.id, task.id, event.currentTarget.checked);
 
     const changeTaskTitle = (changedTitle: string) =>
-      props.changeTaskTitle(props.id, task.id, changedTitle); // changedTitle received from <EditableSpan> via callback, passing forward from <TodoList> to <App> via callback
+      props.changeTaskTitle(props.id, task.id, changedTitle); // changedTitle received from <EditableSpan> via callback, passing forward from <TodoList> to <AppWithReducers> via callback
 
     // return of tasksRendered()
     return (
@@ -50,7 +60,7 @@ export function ToDoList(props: ToDoListPropsType) {
         />
 
         <EditableSpan title={task.title} changeTitle={changeTaskTitle} />
-        {/* Inside of tasksRendered(), <EditableSpan> changes tasks' titles (due to the callback from <App> it receives) ! */}
+        {/* Inside of tasksRendered(), <EditableSpan> changes tasks' titles (due to the callback from <AppWithReducers> it receives) ! */}
         <IconButton onClick={onRemoveTask}>
           <Delete />
         </IconButton>
@@ -76,14 +86,14 @@ export function ToDoList(props: ToDoListPropsType) {
     <div>
       <h3>
         <EditableSpan title={props.title} changeTitle={changeToDoListTitle} />
-        {/* Inside of <TodoList>, <EditableSpan> changes todolist's title (due to the callback from <App> it receives) ! */}
+        {/* Inside of <TodoList>, <EditableSpan> changes todolist's title (due to the callback from <AppWithReducers> it receives) ! */}
 
         <IconButton onClick={removeToDoList}>
           <Delete />
         </IconButton>
       </h3>
       <AddItemForm addItem={addTask} />
-      {/* Inside of <TodoList>, <AddItemForm> adds new task (due to the callback from <App> it receives) ! */}
+      {/* Inside of <TodoList>, <AddItemForm> adds new task (due to the callback from <AppWithReducers> it receives) ! */}
       <ul style={{ listStyle: "none", padding: "0" }}>{tasksRendered}</ul>
       <div>
         <Button
