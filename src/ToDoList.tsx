@@ -1,14 +1,16 @@
-import React, { ChangeEvent } from "react";
+import React, { useCallback } from "react";
 import { AddItemForm } from "./AddItemForm";
 import { EditableSpan } from "./EditableSpan";
-import { Button, Checkbox, IconButton } from "@material-ui/core";
+import { Button, IconButton } from "@material-ui/core";
 import { Delete } from "@material-ui/icons";
 import { FilterValuesType } from "./state/toDoLists-reducer";
 import { TaskType } from "./state/tasks-reducer";
+import { Task } from "./Task";
+// IMPORTS
 
 type ToDoListPropsType = {
-  id: string;
-  title: string;
+  toDoListID: string;
+  toDoListTitle: string;
   toDoListFilter: FilterValuesType;
   tasks: Array<TaskType>;
   removeTask: (toDoListID: string, taskID: string) => void;
@@ -31,70 +33,87 @@ type ToDoListPropsType = {
   changeToDoListTitle: (toDoListID: string, changedTitle: string) => void;
 };
 
-export function ToDoList(props: ToDoListPropsType) {
-  /*const toDoList = useSelector<RootStateType, ToDoListType>(
-    (state) => state.toDoLists.filter((toDoList) => toDoList.id === props.id)[0]
+export const ToDoList = React.memo((props: ToDoListPropsType) => {
+  const removeToDoList = () => props.removeToDoList(props.toDoListID);
+
+  const changeToDoListTitle = useCallback(
+    (changedTitle: string) =>
+      props.changeToDoListTitle(props.toDoListID, changedTitle),
+    [props.changeToDoListTitle, props.toDoListID]
   );
-  const tasksOfToDoList = useSelector<RootStateType, Array<TaskType>>(
-    (state) => state.tasks[props.id]
+
+  const addTask = useCallback(
+    (title: string) => props.addTask(props.toDoListID, title),
+    [props.addTask, props.toDoListID]
   );
 
-  const dispatch = useDispatch();*/
+  const removeTask = useCallback(
+    (taskID: string) => props.removeTask(props.toDoListID, taskID),
+    [props.removeTask, props.toDoListID]
+  );
 
-  const tasksRendered = props.tasks.map((task) => {
-    const onRemoveTask = () => props.removeTask(props.id, task.id);
+  const changeTaskStatus = useCallback(
+    (taskID: string, newIsDoneValue: boolean) =>
+      props.changeTaskStatus(props.toDoListID, taskID, newIsDoneValue),
+    [props.changeTaskStatus, props.toDoListID]
+  );
 
-    const changeTaskStatus = (event: ChangeEvent<HTMLInputElement>) =>
-      props.changeTaskStatus(props.id, task.id, event.currentTarget.checked);
+  const changeTaskTitle = useCallback(
+    (taskID: string, changedTitle: string) =>
+      props.changeTaskTitle(props.toDoListID, taskID, changedTitle),
+    [props.changeTaskTitle, props.toDoListID]
+  ); // changedTitle received from <EditableSpan> via callback, passing forward from <TodoList> to <AppWithRedux> via callback
 
-    const changeTaskTitle = (changedTitle: string) =>
-      props.changeTaskTitle(props.id, task.id, changedTitle); // changedTitle received from <EditableSpan> via callback, passing forward from <TodoList> to <AppWithReducers> via callback
+  const setAllFilterValue = useCallback(
+    () => props.changeToDoListFilter(props.toDoListID, "all"),
+    [props.changeToDoListFilter, props.toDoListID]
+  );
+  const setActiveFilterValue = useCallback(
+    () => props.changeToDoListFilter(props.toDoListID, "active"),
+    [props.changeToDoListFilter, props.toDoListID]
+  );
+  const setCompletedFilterValue = useCallback(
+    () => props.changeToDoListFilter(props.toDoListID, "completed"),
+    [props.changeToDoListFilter, props.toDoListID]
+  );
 
-    // return of tasksRendered()
-    return (
-      <li key={task.id} className={task.isDone ? "is-done" : ""}>
-        <Checkbox
-          checked={task.isDone}
-          onChange={changeTaskStatus}
-          color={"primary"}
-        />
+  function getTasksForToDoList(): Array<TaskType> {
+    switch (props.toDoListFilter) {
+      case "active":
+        return props.tasks.filter((task) => !task.isDone);
+      case "completed":
+        return props.tasks.filter((task) => task.isDone);
+      default:
+        return props.tasks;
+    }
+  }
 
-        <EditableSpan title={task.title} changeTitle={changeTaskTitle} />
-        {/* Inside of tasksRendered(), <EditableSpan> changes tasks' titles (due to the callback from <AppWithReducers> it receives) ! */}
-        <IconButton onClick={onRemoveTask}>
-          <Delete />
-        </IconButton>
-      </li>
-    );
-  });
-
-  const setAllFilterValue = () => props.changeToDoListFilter(props.id, "all");
-  const setActiveFilterValue = () =>
-    props.changeToDoListFilter(props.id, "active");
-  const setCompletedFilterValue = () =>
-    props.changeToDoListFilter(props.id, "completed");
-
-  const addTask = (title: string) => props.addTask(props.id, title);
-
-  const removeToDoList = () => props.removeToDoList(props.id);
-
-  const changeToDoListTitle = (changedTitle: string) =>
-    props.changeToDoListTitle(props.id, changedTitle);
-
-  // return of ToDoList()
   return (
     <div>
       <h3>
-        <EditableSpan title={props.title} changeTitle={changeToDoListTitle} />
-        {/* Inside of <TodoList>, <EditableSpan> changes todolist's title (due to the callback from <AppWithReducers> it receives) ! */}
+        <EditableSpan
+          title={props.toDoListTitle}
+          changeTitle={changeToDoListTitle}
+        />
+        {/* Inside of <TodoList>, <EditableSpan> changes todolist's title (due to the callback from <AppWithRedux> it receives) ! */}
 
         <IconButton onClick={removeToDoList}>
           <Delete />
         </IconButton>
       </h3>
       <AddItemForm addItem={addTask} />
-      {/* Inside of <TodoList>, <AddItemForm> adds new task (due to the callback from <AppWithReducers> it receives) ! */}
-      <ul style={{ listStyle: "none", padding: "0" }}>{tasksRendered}</ul>
+      {/* Inside of <TodoList>, <AddItemForm> adds new task (due to the callback from <AppWithRedux> it receives) ! */}
+      <ul style={{ listStyle: "none", padding: "0" }}>
+        {getTasksForToDoList().map((task) => (
+          <Task
+            key={task.id}
+            task={task}
+            removeTask={removeTask}
+            changeTaskStatus={changeTaskStatus}
+            changeTaskTitle={changeTaskTitle}
+          />
+        ))}
+      </ul>
       <div>
         <Button
           onClick={setAllFilterValue}
@@ -127,4 +146,4 @@ export function ToDoList(props: ToDoListPropsType) {
       </div>
     </div>
   );
-}
+});

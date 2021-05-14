@@ -141,8 +141,8 @@ function App() {
       <Grid item key={toDoList.id}>
         <Paper elevation={6} style={{ padding: "20px" }}>
           <ToDoList
-            id={toDoList.id}
-            title={toDoList.title}
+            toDoListID={toDoList.id}
+            toDoListTitle={toDoList.title}
             toDoListFilter={toDoList.filter}
             tasks={getTasksForToDoList(toDoList)}
             removeTask={removeTask}

@@ -13,7 +13,6 @@ export type TaskType = {
 export type TasksStateType = {
   [key: string]: Array<TaskType>;
 };
-
 type RemoveTaskActionType = {
   type: "REMOVE-TASK";
   toDoListID: string;

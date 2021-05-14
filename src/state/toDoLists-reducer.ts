@@ -6,7 +6,6 @@ export type ToDoListType = {
   title: string;
   filter: FilterValuesType;
 };
-
 export type RemoveToDoListActionType = {
   type: "REMOVE-TODOLIST";
   toDoListID: string;
