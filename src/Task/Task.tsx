@@ -1,11 +1,11 @@
 import React, { ChangeEvent } from "react";
 import { Checkbox, IconButton } from "@material-ui/core";
-import { EditableSpan } from "./EditableSpan";
+import { EditableSpan } from "../EditableSpan/EditableSpan";
 import { Delete } from "@material-ui/icons";
-import { TaskType } from "./state/tasks-reducer";
+import { TaskType } from "../state/tasks-reducer";
 // IMPORTS
 
-type TaskPropsType = {
+export type TaskPropsType = {
   task: TaskType;
   changeTaskStatus: (taskID: string, newIsDoneValue: boolean) => void;
   changeTaskTitle: (taskID: string, changedTitle: string) => void;

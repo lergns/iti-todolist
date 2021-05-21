@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
-import { ToDoList } from "./ToDoList";
-import { AddItemForm } from "./AddItemForm";
+import { ToDoList } from "../ToDoList/ToDoList";
+import { AddItemForm } from "../AddItemForm/AddItemForm";
 import "./App.css";
 import {
   AppBar,
@@ -20,20 +20,20 @@ import {
   FilterValuesType,
   removeToDoListAC,
   ToDoListType,
-} from "./state/toDoLists-reducer";
+} from "../state/toDoLists-reducer";
 import {
   addTaskAC,
   changeTaskStatusAC,
   changeTaskTitleAC,
   removeTaskAC,
   TasksStateType,
-} from "./state/tasks-reducer";
+} from "../state/tasks-reducer";
 import { useDispatch, useSelector } from "react-redux";
-import { RootStateType } from "./state/store";
+import { RootStateType } from "../state/store";
 // IMPORTS
 
 //
-function AppWithRedux() {
+export function AppWithRedux() {
   const toDoLists = useSelector<RootStateType, Array<ToDoListType>>(
     (state) => state.toDoLists
   );

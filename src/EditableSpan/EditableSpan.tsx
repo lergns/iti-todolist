@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from "react";
 import { TextField } from "@material-ui/core";
 
-type EditableSpanPropsType = {
+export type EditableSpanPropsType = {
   title: string; // either task.title - if passed from Task(), or toDoList.title - if passed from TodoList()
   changeTitle: (changedTitle: string) => void; // either changeTaskTitle() - if passed from Task(), or changeToDoListTitle() - if passed from TodoList()
 };

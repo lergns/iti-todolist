@@ -1,11 +1,11 @@
 import React, { useCallback } from "react";
-import { AddItemForm } from "./AddItemForm";
-import { EditableSpan } from "./EditableSpan";
+import { AddItemForm } from "../AddItemForm/AddItemForm";
+import { EditableSpan } from "../EditableSpan/EditableSpan";
 import { Button, IconButton } from "@material-ui/core";
 import { Delete } from "@material-ui/icons";
-import { FilterValuesType } from "./state/toDoLists-reducer";
-import { TaskType } from "./state/tasks-reducer";
-import { Task } from "./Task";
+import { FilterValuesType } from "../state/toDoLists-reducer";
+import { TaskType } from "../state/tasks-reducer";
+import { Task } from "../Task/Task";
 // IMPORTS
 
 type ToDoListPropsType = {

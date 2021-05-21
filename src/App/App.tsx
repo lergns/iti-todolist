@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./App.css";
-import { ToDoList } from "./ToDoList";
+import { ToDoList } from "../ToDoList/ToDoList";
 import { v1 } from "uuid";
-import { AddItemForm } from "./AddItemForm";
+import { AddItemForm } from "../AddItemForm/AddItemForm";
 import {
   AppBar,
   Button,
@@ -14,8 +14,8 @@ import {
   Typography,
 } from "@material-ui/core";
 import { Menu } from "@material-ui/icons";
-import { FilterValuesType, ToDoListType } from "./state/toDoLists-reducer";
-import { TasksStateType, TaskType } from "./state/tasks-reducer";
+import { FilterValuesType, ToDoListType } from "../state/toDoLists-reducer";
+import { TasksStateType, TaskType } from "../state/tasks-reducer";
 
 function App() {
   const toDoListID_1 = v1();
