@@ -1,7 +1,7 @@
 import React, { useReducer } from "react";
-import { ToDoList } from "./ToDoList";
+import { ToDoList } from "../ToDoList/ToDoList";
 import { v1 } from "uuid";
-import { AddItemForm } from "./AddItemForm";
+import { AddItemForm } from "../AddItemForm/AddItemForm";
 import "./App.css";
 import {
   AppBar,
@@ -22,7 +22,7 @@ import {
   removeToDoListAC,
   toDoListsReducer,
   ToDoListType,
-} from "./state/toDoLists-reducer";
+} from "../state/toDoLists-reducer";
 import {
   addTaskAC,
   changeTaskStatusAC,
@@ -30,7 +30,7 @@ import {
   removeTaskAC,
   tasksReducer,
   TaskType,
-} from "./state/tasks-reducer";
+} from "../state/tasks-reducer";
 
 function AppWithReducers() {
   const toDoListID_1 = v1();
