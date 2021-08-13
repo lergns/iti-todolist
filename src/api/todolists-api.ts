@@ -1,6 +1,18 @@
 import axios from "axios";
 import { RequestStatusType } from "../app/app-reducer";
 
+export type TodolistType = {
+  id: string;
+  title: string;
+  addedDate: string;
+  order: number;
+};
+export type ResponseType<D = {}> = {
+  resultCode: number;
+  messages: Array<string>;
+  data: D;
+};
+
 export enum TaskStatuses {
   New = 0,
   InProgress = 1,
@@ -16,17 +28,6 @@ export enum TaskPriorities {
   Later = 4,
 }
 
-export type TodolistType = {
-  id: string;
-  title: string;
-  addedDate: string;
-  order: number;
-};
-export type ResponseType<D = {}> = {
-  resultCode: number;
-  messages: Array<string>;
-  data: D;
-};
 export type TaskType = {
   description: string;
   title: string;
@@ -53,6 +54,17 @@ type GetTasksResponse = {
   totalCount: number;
   items: TaskType[];
 };
+export type LoginParamsType = {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+  captcha?: string;
+};
+type GetAuthMeDataType = {
+  id: number;
+  email: string;
+  login: string;
+};
 // TYPES
 
 const settings = {
@@ -65,6 +77,21 @@ const instance = axios.create({
   baseURL: "https://social-network.samuraijs.com/api/1.1/",
   ...settings,
 });
+
+export const authAPI = {
+  me() {
+    return instance.get<ResponseType<GetAuthMeDataType>>("auth/me");
+  },
+  login(loginParams: LoginParamsType) {
+    return instance.post<ResponseType<{ userId?: number }>>(
+      "auth/login",
+      loginParams
+    );
+  },
+  logout() {
+    return instance.delete<ResponseType>("auth/login");
+  },
+};
 
 export const todolistsAPI = {
   getTodolists() {
