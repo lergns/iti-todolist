@@ -33,7 +33,7 @@ export const Task = React.memo((props: TaskPropsType) => {
       let newIsDoneValue = e.currentTarget.checked;
       props.changeTaskStatus(
         props.task.id,
-        newIsDoneValue ? TaskStatuses.Completed : TaskStatuses.New,
+        newIsDoneValue ? TaskStatuses.Completed : TaskStatuses.Active,
         props.todolistId
       );
     },

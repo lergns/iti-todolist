@@ -14,7 +14,7 @@ export type ResponseType<D = {}> = {
 };
 
 export enum TaskStatuses {
-  New = 0,
+  Active = 0,
   InProgress = 1,
   Completed = 2,
   Draft = 3,
@@ -26,6 +26,12 @@ export enum TaskPriorities {
   Hi = 2,
   Urgently = 3,
   Later = 4,
+}
+
+export enum ResponseStatuses {
+  Success = 0,
+  Error = 1,
+  Captcha = 10,
 }
 
 export type TaskType = {

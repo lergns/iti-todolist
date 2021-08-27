@@ -23,6 +23,7 @@ type FormikErrorsType = {
 
 export const Login = () => {
   const dispatch = useDispatch();
+
   const isLoggedIn = useSelector<AppRootStateType, boolean>(
     (state) => state.auth.isLoggedIn
   );
@@ -69,10 +70,11 @@ export const Login = () => {
             <FormControl>
               <FormLabel>
                 <p>
-                  To log in get registered
+                  Sign up to log in
                   <a
                     href={"https://social-network.samuraijs.com/"}
                     target={"_blank"}
+                    rel={"noreferrer"}
                   >
                     here
                   </a>
@@ -85,10 +87,6 @@ export const Login = () => {
                 <TextField
                   label="Email"
                   margin="normal"
-                  // name="email"
-                  // onChange={formik.handleChange}
-                  // onBlur={formik.handleBlur} /* displays errors on blur */
-                  // value={formik.values.email}
                   {...formik.getFieldProps(
                     "email"
                   )} /* reducing boilerplate code from above by ...formik.getFieldProps() ! */

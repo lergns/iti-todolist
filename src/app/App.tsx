@@ -8,7 +8,6 @@ import {
   IconButton,
   LinearProgress,
   Toolbar,
-  Typography,
 } from "@material-ui/core";
 import { Menu } from "@material-ui/icons";
 import { TodolistsList } from "../features/TodolistsList/TodolistsList";
@@ -20,12 +19,9 @@ import { logoutTC } from "../features/Login/auth-reducer";
 import { Login } from "../features/Login/Login";
 import { Redirect, Route, Switch } from "react-router-dom";
 
-function App() {
-  useEffect(() => {
-    dispatch(initializeAppTC());
-  }, []);
-
+export const App = () => {
   const dispatch = useDispatch();
+
   const status = useSelector<AppRootStateType, RequestStatusType>(
     (state) => state.app.status
   );
@@ -35,6 +31,10 @@ function App() {
   const isLoggedIn = useSelector<AppRootStateType, boolean>(
     (state) => state.auth.isLoggedIn
   );
+
+  useEffect(() => {
+    dispatch(initializeAppTC());
+  }, [dispatch]);
 
   const logoutHandler = () => dispatch(logoutTC());
 
@@ -60,7 +60,6 @@ function App() {
             <IconButton edge="start" color="inherit" aria-label="menu">
               <Menu />
             </IconButton>
-            <Typography variant="h6">News</Typography>
             {/* only displayed when isLoggedIn === true */}
             {isLoggedIn && (
               <Button onClick={logoutHandler} color="inherit">
@@ -83,6 +82,4 @@ function App() {
       </div>
     );
   }
-}
-
-export default App;
+};
