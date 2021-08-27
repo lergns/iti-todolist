@@ -23,9 +23,9 @@ export enum TaskStatuses {
 export enum TaskPriorities {
   Low = 0,
   Middle = 1,
-  Hi = 2,
-  Urgently = 3,
-  Later = 4,
+  High = 2,
+  Urgent = 3,
+  Irrelevant = 4,
 }
 
 export enum ResponseStatuses {
@@ -73,15 +73,12 @@ type GetAuthMeDataType = {
 };
 // TYPES
 
-const settings = {
+const instance = axios.create({
+  baseURL: "https://social-network.samuraijs.com/api/1.1/",
   withCredentials: true,
   headers: {
     "API-KEY": "264a0581-6cdc-4a28-9b7e-b8b5b1060aa0",
   },
-};
-const instance = axios.create({
-  baseURL: "https://social-network.samuraijs.com/api/1.1/",
-  ...settings,
 });
 
 export const authAPI = {
