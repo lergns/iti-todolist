@@ -38,12 +38,11 @@ const slice = createSlice({
       }
     },
     addTodolist(state, action: PayloadAction<{ todolist: TodolistType }>) {
-      // state.unshift() - adding to the beginning of state
       state.unshift({
         ...action.payload.todolist,
         filter: "all",
         entityStatus: "idle",
-      });
+      }); // state.unshift() - adding to the beginning of state array
     },
     changeTodolistTitle(
       state,
@@ -92,11 +91,11 @@ const slice = createSlice({
       }));
     },
     clearTodolistsData(state) {
-      return (state = initialState);
+      return (state = [] as Array<TodolistDomainType>);
     },
   },
 });
-
+// ffe
 export const todolistsReducer = slice.reducer;
 export const {
   changeTodolistEntityStatus,
@@ -104,8 +103,8 @@ export const {
   changeTodolistTitle,
   removeTodolist,
   setTodolists,
-  addTodolist,
   clearTodolistsData,
+  addTodolist,
 } = slice.actions;
 
 export const fetchTodolistsTC = (): AppThunkType => (dispatch) => {

@@ -6,6 +6,7 @@ import { AppThunkType } from "./store";
 
 export type RequestStatusType = "idle" | "loading" | "succeeded" | "failed"; // if "loading" - show Preloader
 export type ErrorType = string | null;
+export type AppInitialStateType = typeof initialState;
 // TYPES
 
 const initialState = {

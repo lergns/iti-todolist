@@ -70,7 +70,7 @@ export const Login = () => {
             <FormControl>
               <FormLabel>
                 <p>
-                  Sign up to log in
+                  {"Sign up to log in "}
                   <a
                     href={"https://social-network.samuraijs.com/"}
                     target={"_blank"}

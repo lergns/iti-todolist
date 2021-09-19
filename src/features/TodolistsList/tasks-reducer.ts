@@ -98,7 +98,6 @@ const slice = createSlice({
       state[action.payload.todolistId] = action.payload.tasks;
     },
   },
-  // reducers/ACs imported from another reducer
   extraReducers(builder) {
     builder.addCase(addTodolist, (state, action) => {
       state[action.payload.todolist.id] = [];
@@ -112,9 +111,9 @@ const slice = createSlice({
       });
     });
     builder.addCase(clearTodolistsData, (state) => {
-      return (state = initialState);
+      return (state = {} as TasksStateType);
     });
-  },
+  }, // reducers/ACs imported from another reducer
 });
 
 export const tasksReducer = slice.reducer;

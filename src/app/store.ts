@@ -23,7 +23,6 @@ const rootReducer = combineReducers({
 
 export const store = configureStore({
   reducer: rootReducer,
-  // prepends (adds to the beginning) getDefaultMiddleware() return value with thunkMiddleware (imported from redux-thunk)
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(thunkMiddleware),
 });
